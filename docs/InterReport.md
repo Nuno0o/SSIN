@@ -1,10 +1,11 @@
-# Especificação do projeto SSIN
+## Especificação do projeto SSIN - Odd security features
 
 ## Elaborado por  
 |Nuno Martins|Gonçalo Ribeiro|Diogo Cepa|
 |-|-|-|
 |up201405079|-|-|
-## Tema
+
+# Electronic Voting
 
 ## Introdução
 
