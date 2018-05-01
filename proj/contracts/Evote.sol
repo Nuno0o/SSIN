@@ -3,7 +3,7 @@ pragma solidity ^0.4.17;
 contract Evote {
     address public owner;
     uint public last_completed_migration;
-
+    Election public election;
 
     struct Election{
         Option[] options;
