@@ -28,7 +28,7 @@ contract Ballot {
         _;
     }
     // Already voted
-    function alreadyVoted(address _a) public returns(bool){
+    function alreadyVoted(address _a) public view returns(bool){
         bool voted = false;
         for(uint i = 0; i < voters.length && !voted; i++){
             voted = voters[i] == _a;
@@ -36,7 +36,7 @@ contract Ballot {
         return voted;
     }
     // Option exists
-    function optionExists(uint _op) public returns(bool) {
+    function optionExists(uint _op) public view returns(bool) {
         return _op >= 0 && _op < options.length;
     }
     // Constructor
@@ -69,7 +69,7 @@ contract Ballot {
         nvotes[_option] += 1; 
     }
     // Get winner
-    function getWinner() public electionEnded returns(string){
+    function getWinner() public view electionEnded returns(string){
         uint max = 0;
         for(uint i = 0; i < options.length; i++){
             if(nvotes[i] >= max){
