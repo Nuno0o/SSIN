@@ -28,7 +28,7 @@ export default {
     console.log(enc)
     var dec = key.decrypt(enc,'utf8')
     console.log(dec)
-    debugger
+    
   },
   data() {
     return {
