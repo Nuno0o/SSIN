@@ -19,7 +19,16 @@
 export default {
   name: 'Main',
   created:  function () {
-
+    var NodeRSA = require('node-rsa');
+    var key = new NodeRSA({b:512})
+    var a = 1
+    console.log(key.exportKey('pkcs8-private-pem'))
+    console.log(key.exportKey('pkcs8-public-pem'))
+    var enc = key.encrypt(':^)+' + Math.random().toString(36).substring(16),'base64')
+    console.log(enc)
+    var dec = key.decrypt(enc,'utf8')
+    console.log(dec)
+    debugger
   },
   data() {
     return {
