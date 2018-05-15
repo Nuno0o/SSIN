@@ -1,7 +1,7 @@
 <template>
 <div>
   <h1>Voting app (Admin)</h1>
-  <h2>0x15ae708a1ecdb2553e00a5788bdad809d6bc04b6</h2>
+  <h2>0x2ac7d296d27a3cf887239bd015ea69fda43f209d</h2>
   <div v-if="!loadedContract">
     <input v-model="address" placeholder="Contract address">
     <button @click="instContract">Load</button>

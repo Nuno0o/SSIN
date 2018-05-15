@@ -1,12 +1,75 @@
 var abi = [
 	{
-		"constant": true,
-		"inputs": [],
-		"name": "winningProposal",
+		"constant": false,
+		"inputs": [
+			{
+				"name": "toVoter",
+				"type": "address"
+			}
+		],
+		"name": "giveRightToVote",
 		"outputs": [
 			{
-				"name": "_winningProposal",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"name": "_numProposals",
 				"type": "uint8"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"constant": false,
+		"inputs": [
+			{
+				"name": "toProposal",
+				"type": "uint8"
+			}
+		],
+		"name": "vote",
+		"outputs": [
+			{
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"payable": false,
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getChairperson",
+		"outputs": [
+			{
+				"name": "",
+				"type": "address"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"constant": true,
+		"inputs": [],
+		"name": "getNProposals",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
 			}
 		],
 		"payable": false,
@@ -35,26 +98,7 @@ var abi = [
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "getChairperson",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "toVoter",
-				"type": "address"
-			}
-		],
-		"name": "giveRightToVote",
+		"name": "getRightToVote",
 		"outputs": [
 			{
 				"name": "",
@@ -62,52 +106,22 @@ var abi = [
 			}
 		],
 		"payable": false,
-		"stateMutability": "nonpayable",
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
 		"constant": true,
 		"inputs": [],
-		"name": "getNProposals",
+		"name": "winningProposal",
 		"outputs": [
 			{
-				"name": "",
-				"type": "uint256"
+				"name": "_winningProposal",
+				"type": "uint8"
 			}
 		],
 		"payable": false,
 		"stateMutability": "view",
 		"type": "function"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "toProposal",
-				"type": "uint8"
-			}
-		],
-		"name": "vote",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"name": "_numProposals",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
 	}
 ]
 

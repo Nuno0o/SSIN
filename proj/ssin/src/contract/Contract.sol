@@ -17,15 +17,19 @@ contract Ballot {
         voters[chairperson].canVote = true;
         proposals.length = _numProposals;
     }
-
+    /// Get address of chairperson(creator of the ballot)
     function getChairperson() public constant returns (address) {
         return chairperson;
     }
-
+    /// Get if user has right to vote
+    function getRightToVote() public constant returns (bool) {
+      return voters[msg.sender].canVote && !voters[msg.sender].voted;
+    }
+    /// Get number of proposals
     function getNProposals() public constant returns (uint) {
         return proposals.length;
     }
-
+    /// Get number of votes on certain proposal
     function getNVotes(uint8 index) public constant returns (uint) {
         if(index >= proposals.length || msg.sender != chairperson) return 0;
         return proposals[index].voteCount;
@@ -44,11 +48,10 @@ contract Ballot {
         Voter storage sender = voters[msg.sender];
         if (sender.voted || toProposal >= proposals.length) return false;
         sender.voted = true;
-        sender.canVote = false;
         proposals[toProposal].voteCount += 1;
         return true;
     }
-
+    /// Get winning proposal
     function winningProposal() public constant returns (uint8 _winningProposal) {
         uint256 winningVoteCount = 0;
         for (uint8 prop = 0; prop < proposals.length; prop++)
