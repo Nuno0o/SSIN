@@ -1,44 +1,75 @@
 <template>
 <div>
   <h1>Voting app</h1>
-  <input v-model="address" placeholder="Contract address">
-  <button @click="instContract">Load</button>
+  <h2>0x15ae708a1ecdb2553e00a5788bdad809d6bc04b6</h2>
+  <div v-if="!loadedContract">
+    <input v-model="address" placeholder="Contract address">
+    <button @click="instContract">Load</button>
+  </div>
+  <div v-if="loadedContract">
+    <button v-for="index in nOptions" @click="vote(index-1)">Option {{index-1}}</Button>
+    <br>
+    <button v-if="loadedContract" id="close" @click="closeContract">Close</button>
+  </div>
+
 </div>
 </template>
 
 <script>
 export default {
   name: 'Main',
+  created:  function () {
+
+  },
   data() {
     return {
       address: '',
-      contract: null
+      contract: null,
+      loadedContract: false,
+      voterAddress: '',
+      nOptions: 0
     }
   },
   methods: {
-    instContract() {
-      var abi = [{
-        "constant": true,
-        "inputs": [],
-        "name": "renderHelloWorld",
-        "outputs": [{
-          "name": "",
-          "type": "string"
-        }],
-        "payable": false,
-        "stateMutability": "pure",
-        "type": "function"
-      }]
-      var address = '0xc4269c1037585759cf16266576080ce5a985de7a'
+    instContract () {
+      var abi = require('../contract/Contract.js').abi
+      var address = this.address
       web3.eth.defaultAccount = web3.eth.accounts[0]
       this.contract = web3.eth.contract(abi).at(address)
-      this.contract.renderHelloWorld((error, result) => {
+      this.contract.getChairperson((error, result) => {
         if(!error){
-          alert(result)
+          if(result != '0x'){
+            this.loadedContract = true
+            this.getVotes()
+          } else {
+            alert('Couldn\'t load contract')
+          }
+        } else {
+          alert('Invalid id')
+        }
+      })
+    },
+    getVotes() {
+      this.contract.getNProposals((error, result) => {
+        if(!error){
+          this.nOptions = parseInt(result)
+        } else {
+        }
+      })
+    },
+    vote (index) {
+      alert(index)
+      this.contract.vote(index,(error, result) => {
+        if(!error){
+          //alert(result)
         } else {
 
         }
       })
+    },
+    closeContract () {
+      this.contract = null
+      this.loadedContract = null
     }
   }
 }
@@ -63,5 +94,9 @@ li {
 
 a {
   color: #42b983;
+}
+
+#close {
+  margin-top: 20px;
 }
 </style>

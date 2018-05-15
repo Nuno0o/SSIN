@@ -3,10 +3,13 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import VueLocalStorage from 'vue-localstorage'
 
 Vue.config.productionTip = false
 
-//var solc = require('solc')
+Vue.use(VueLocalStorage)
+
+window.Vue = Vue
 
 window.addEventListener('load', function() {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
@@ -14,7 +17,7 @@ window.addEventListener('load', function() {
     // Use MetaMask's provider
     //web3js = new Web3(web3.currentProvider);
   } else {
-    console.log('No web3? You should consider trying MetaMask!')
+    console.log('Web3 not detected!')
     alert('Web3 not detected!')
   }
   // Now you can start your app & access web3 freely:

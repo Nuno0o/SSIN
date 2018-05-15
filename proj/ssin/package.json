@@ -12,7 +12,10 @@
   "dependencies": {
     "module": "^1.2.5",
     "raw-loader": "^0.5.1",
+    "solc": "^0.4.23",
+    "solc-loader": "^1.1.1",
     "vue": "^2.5.2",
+    "vue-localstorage": "^0.6.2",
     "vue-router": "^3.0.1"
   },
   "devDependencies": {
