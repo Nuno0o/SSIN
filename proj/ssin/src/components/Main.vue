@@ -58,7 +58,6 @@ export default {
       })
     },
     vote (index) {
-      alert(index)
       this.contract.vote(index,(error, result) => {
         if(!error){
           //alert(result)
