@@ -25,6 +25,7 @@ contract Ballot {
     uint n_choices;
     //Voting ended
     bool ended;
+    /*-------------CONSTRUCTOR----------*/
     /// Create a new ballot with $(_numProposals) different proposals, public encryption key and chairperson
     constructor(address _owner, uint8 _numProposals, string _publicKey) public {
         chairperson = _owner;
@@ -33,21 +34,20 @@ contract Ballot {
         voters[chairperson].canVote = true;
         ended = false;
     }
+    
+    /*--------------GETTERS---------------*/
+    
     /// Get address of chairperson(creator of the ballot)
     function getChairperson() public constant returns (address) {
         return chairperson;
     }
     /// Get if user has right to vote
     function getRightToVote() public constant returns (bool) {
-      return voters[msg.sender].canVote;
+        return voters[msg.sender].canVote;
     }
     /// Get number of proposals
     function getNChoices() public constant returns (uint) {
         return n_choices;
-    }
-    /// Get list of votes
-    function getVotes() public constant returns (address[]) {
-        return voted;
     }
     /// Get public encryption key
     function getKey() public constant returns (string) {
@@ -57,6 +57,17 @@ contract Ballot {
     function getEnded() public constant returns (bool) {
         return ended;
     }
+    /// Get list of voters
+    function getVoters() public constant returns (address[]){
+        return voted;
+    }
+    /// Get vote of voter
+    function getVote(address addr) public constant returns(string){
+        return voters[addr].vote;
+    }
+    
+    /*--------------TRANSACTIONS---------------*/
+    
     /// End election
     function endVoting() public returns (bool) {
         ended = true;
@@ -71,7 +82,7 @@ contract Ballot {
 
     /// Vote
     function castVote(string vote) public returns (bool){
-        if(voters[msg.sender].canVote != true) return false;
+        if(voters[msg.sender].canVote != true || ended) return false;
         voters[msg.sender].vote = vote;
         bool alreadyVotedBefore = false;
         for(uint i = 0; i < voted.length; i++){
@@ -85,13 +96,4 @@ contract Ballot {
         }
         return true;
     }
-    /*/// Get winning proposal
-    function winningProposal() public constant returns (uint8 _winningProposal) {
-        uint256 winningVoteCount = 0;
-        for (uint8 prop = 0; prop < proposals.length; prop++)
-            if (proposals[prop].voteCount > winningVoteCount) {
-                winningVoteCount = proposals[prop].voteCount;
-                _winningProposal = prop;
-            }
-    }*/
 }
