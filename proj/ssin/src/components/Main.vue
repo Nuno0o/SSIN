@@ -19,7 +19,7 @@
 export default {
   name: 'Main',
   created:  function () {
-    var NodeRSA = require('node-rsa');
+    /* var NodeRSA = require('node-rsa');
     var key = new NodeRSA({b:512})
     var a = 1
     console.log(key.exportKey('pkcs8-private-pem'))
@@ -27,8 +27,17 @@ export default {
     var enc = key.encrypt(':^)+' + Math.random().toString(36).substring(16),'base64')
     console.log(enc)
     var dec = key.decrypt(enc,'utf8')
-    console.log(dec)
-    
+    console.log(dec) */
+    /*var abi = require('../contract/Contract.js').abi3
+    var address = '0xa8fcfcc75fc11459705c06ed80f8cb90848b38ac'
+    web3.eth.defaultAccount = web3.eth.accounts[0]
+    var contract = web3.eth.contract(abi).at(address)
+    contract.createBallot.call(8,(error, result) => {
+      console.log(result)
+    })
+    /*contract.createBallot(8,(error, result) => {
+      console.log(result)
+    })*/
   },
   data() {
     return {

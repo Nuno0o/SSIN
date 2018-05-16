@@ -23,7 +23,7 @@ contract Ballot {
     }
     /// Get if user has right to vote
     function getRightToVote() public constant returns (bool) {
-      return voters[msg.sender].canVote && !voters[msg.sender].voted;
+        return voters[msg.sender].canVote && !voters[msg.sender].voted;
     }
     /// Get number of proposals
     function getNProposals() public constant returns (uint) {
