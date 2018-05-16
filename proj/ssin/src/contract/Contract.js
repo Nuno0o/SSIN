@@ -1,134 +1,35 @@
-var abi = [
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "toVoter",
-				"type": "address"
-			}
-		],
-		"name": "giveRightToVote",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"name": "_numProposals",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"constant": false,
-		"inputs": [
-			{
-				"name": "toProposal",
-				"type": "uint8"
-			}
-		],
-		"name": "vote",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getChairperson",
-		"outputs": [
-			{
-				"name": "",
-				"type": "address"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getNProposals",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [
-			{
-				"name": "index",
-				"type": "uint8"
-			}
-		],
-		"name": "getNVotes",
-		"outputs": [
-			{
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "getRightToVote",
-		"outputs": [
-			{
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"constant": true,
-		"inputs": [],
-		"name": "winningProposal",
-		"outputs": [
-			{
-				"name": "_winningProposal",
-				"type": "uint8"
-			}
-		],
-		"payable": false,
-		"stateMutability": "view",
-		"type": "function"
-	}
+abi = [{
+    "constant": false,
+    "inputs": [{
+        "name": "nOptions",
+        "type": "uint8"
+      },
+      {
+        "name": "publicKey",
+        "type": "string"
+      }
+    ],
+    "name": "createBallot",
+    "outputs": [{
+      "name": "ballotAddress",
+      "type": "address"
+    }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  }
 ]
 
-var abi2 = [{
+abi2 = [{
     "constant": true,
     "inputs": [],
-    "name": "getRightToVote",
+    "name": "getEnded",
     "outputs": [{
       "name": "",
       "type": "bool"
@@ -140,25 +41,37 @@ var abi2 = [{
   {
     "constant": true,
     "inputs": [],
-    "name": "winningProposal",
+    "name": "getNChoices",
     "outputs": [{
-      "name": "_winningProposal",
-      "type": "uint8"
+      "name": "",
+      "type": "uint256"
     }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "constant": true,
+    "constant": false,
     "inputs": [{
-      "name": "index",
-      "type": "uint8"
+      "name": "user",
+      "type": "address"
     }],
-    "name": "getNVotes",
+    "name": "givePermission",
     "outputs": [{
       "name": "",
-      "type": "uint256"
+      "type": "bool"
+    }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": true,
+    "inputs": [],
+    "name": "getRightToVote",
+    "outputs": [{
+      "name": "",
+      "type": "bool"
     }],
     "payable": false,
     "stateMutability": "view",
@@ -177,12 +90,51 @@ var abi2 = [{
     "type": "function"
   },
   {
-    "constant": false,
+    "constant": true,
+    "inputs": [],
+    "name": "getKey",
+    "outputs": [{
+      "name": "",
+      "type": "string"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": true,
     "inputs": [{
-      "name": "toVoter",
+      "name": "addr",
       "type": "address"
     }],
-    "name": "giveRightToVote",
+    "name": "getVote",
+    "outputs": [{
+      "name": "",
+      "type": "string"
+    }],
+    "payable": false,
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [{
+      "name": "vote",
+      "type": "string"
+    }],
+    "name": "castVote",
+    "outputs": [{
+      "name": "",
+      "type": "bool"
+    }],
+    "payable": false,
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "constant": false,
+    "inputs": [],
+    "name": "endVoting",
     "outputs": [{
       "name": "",
       "type": "bool"
@@ -194,93 +146,36 @@ var abi2 = [{
   {
     "constant": true,
     "inputs": [],
-    "name": "getNProposals",
+    "name": "getVoters",
     "outputs": [{
       "name": "",
-      "type": "uint256"
+      "type": "address[]"
     }],
     "payable": false,
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "constant": false,
     "inputs": [{
-      "name": "toProposal",
-      "type": "uint8"
-    }],
-    "name": "vote",
-    "outputs": [{
-      "name": "",
-      "type": "bool"
-    }],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [{
-        "name": "owner",
+        "name": "_owner",
         "type": "address"
       },
       {
         "name": "_numProposals",
         "type": "uint8"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  }
-]
-
-var abi3 = [{
-    "constant": false,
-    "inputs": [{
-        "name": "a",
-        "type": "uint8"
       },
       {
-        "name": "b",
-        "type": "uint8"
+        "name": "_publicKey",
+        "type": "string"
       }
     ],
-    "name": "test",
-    "outputs": [{
-      "name": "",
-      "type": "uint8"
-    }],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [{
-      "name": "nOptions",
-      "type": "uint8"
-    }],
-    "name": "createBallot",
-    "outputs": [{
-      "name": "ballotAddress",
-      "type": "address"
-    }],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "payable": false,
     "stateMutability": "nonpayable",
     "type": "constructor"
   }
 ]
-
-
 
 module.exports = {
   abi: abi,
-  abi2: abi2,
-  abi3: abi3
+  abi2:abi2
 }
