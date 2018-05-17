@@ -53,7 +53,29 @@
 export default {
   name: 'Main',
   created:  function () {
-    
+    var abi = require('../contract/Contract.js').abi
+    var address = require('../contract/Contract.js').creator
+    web3.eth.defaultAccount = web3.eth.accounts[0]
+    var contract = web3.eth.contract(abi).at(address)
+    contract.listOfPolls.call((error, success) => {
+      if(!error){
+        var abipoll = require('../contract/Contract.js').abi2
+        success.forEach(elem => {
+          console.log(elem)
+          var addresspoll = elem
+          var contractpoll = web3.eth.contract(abipoll).at(addresspoll)
+          contractpoll.getTimeStamp.call((error, success) => {
+            if(!error){
+              this.listOfPolls.push({'address': addresspoll, 'timestamp': parseInt(success)})
+              this.$forceUpdate()
+            }
+          })
+          
+        })
+      } else {
+        alert('Error retrieving list of polls')
+      }
+    })
   },
   data() {
     return {

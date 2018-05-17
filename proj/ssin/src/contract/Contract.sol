@@ -23,7 +23,7 @@ contract Poll {
     //Owner of the poll
     address chairperson;
     //Id of block before creation
-    uint block_number;
+    uint block_time;
     //Map of addresses to voter
     mapping(address => Voter) voters;
     //List of addresses that voted
@@ -42,7 +42,7 @@ contract Poll {
         public_key = _publicKey;
         voters[chairperson].canVote = true;
         ended = false;
-        block_number = block.number;
+        block_time = block.timestamp;
     }
     
     /*--------------GETTERS---------------*/
@@ -74,6 +74,10 @@ contract Poll {
     /// Get vote of voter
     function getVote(address addr) public constant returns(string){
         return voters[addr].vote;
+    }
+    /// Get timestamp
+    function getTimeStamp() public constant returns (uint){
+        return block_time;
     }
     
     /*--------------TRANSACTIONS---------------*/

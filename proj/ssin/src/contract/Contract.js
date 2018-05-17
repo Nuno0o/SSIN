@@ -201,6 +201,20 @@ abi2 = [
 		"type": "function"
 	},
 	{
+		"constant": true,
+		"inputs": [],
+		"name": "getTimeStamp",
+		"outputs": [
+			{
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"payable": false,
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"name": "_owner",
@@ -222,7 +236,7 @@ abi2 = [
 ]
 
 
-creator = "0xcb7054f17940c41e5f0b4854ba166a2f914053cf"
+creator = "0x07c253667f8cdd0806bd5eb27e36b9d0263d8c08"
 
 module.exports = {
   abi: abi,
