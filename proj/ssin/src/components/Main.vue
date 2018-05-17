@@ -2,25 +2,25 @@
 <div>
   <h1>Voting app SSIN</h1>
   <div v-if="contract == null">
-    <h2>Enter Ballot Address:</h2>
-    <input v-model="address" placeholder="Ballot address">
-    <button @click="loadBallot">Load</button>
-    <h2>Or create a new Ballot:</h2>
+    <h2>Enter Poll Address:</h2>
+    <input v-model="address" placeholder="Poll address">
+    <button @click="loadPoll">Load</button>
+    <h2>Or create a new Poll:</h2>
     <input type="number" v-model="noptions" placeholder="Number of options">
-    <button @click="createBallot">Create</button>
+    <button @click="createPoll">Create</button>
     <br>
-    <div v-if="ballotCreatedAdr != null && ballotCreatedKey != null">
+    <div v-if="pollCreatedAdr != null && pollCreatedKey != null">
       <br>
       <br>
-      The address of the created ballot is : {{ballotCreatedAdr}}
+      The address of the created poll is : {{pollCreatedAdr}}
       <br>
       <br>
       <br>
-      Save the following private key to decrypt the votes:<br><br> {{ballotCreatedKey}}
+      Save the following private key to decrypt the votes:<br><br> {{pollCreatedKey}}
     </div>
   </div>
-  <div v-if="contract != null && ballotOwner === true">
-    <h1>Ballot owner Menu</h1>
+  <div v-if="contract != null && pollOwner === true">
+    <h1>Poll owner Menu</h1>
     <h2>Give voting permission to following address:</h2>
     <input v-model="voterAddress" placeholder="Voter address">
     <button @click="givePerm">Give permission</button>
@@ -53,24 +53,25 @@
 export default {
   name: 'Main',
   created:  function () {
-
+    
   },
   data() {
     return {
+      listOfPolls: [],
       noptions: null,
-      ballotOwner: null,
+      pollOwner: null,
       address: '',
       contract: null,
       voterAddress: '',
       privateKey: '',
       nvoteoptions: 0,
       results: [],
-      ballotCreatedAdr: null,
-      ballotCreatedKey: null
+      pollCreatedAdr: null,
+      pollCreatedKey: null
     }
   },
   methods: {
-    createBallot () {
+    createPoll () {
       if (this.noptions < 1){
         alert('Needs to have more than 0 options!')
         return
@@ -83,22 +84,22 @@ export default {
       var key = new NodeRSA({b:512})
       var privatekey = key.exportKey('pkcs8-private-pem')
       var publickey = key.exportKey('pkcs8-public-pem')
-      contract.createBallot.call(this.noptions, publickey, (error, result) => {
+      contract.createPoll.call(this.noptions, publickey, (error, result) => {
         if(!error){
-          var ballotAddress = result
-          contract.createBallot(this.noptions, publickey, (error, result) => {
+          var pollAddress = result
+          contract.createPoll(this.noptions, publickey, (error, result) => {
             if(!error){
-              this.ballotCreatedAdr = ballotAddress
-              this.ballotCreatedKey = privatekey
+              this.pollCreatedAdr = pollAddress
+              this.pollCreatedKey = privatekey
               this.$forceUpdate()
             }
           })
         } else {
-          alert('Couldn\'t create ballot')
+          alert('Couldn\'t create poll')
         }
       })
     },
-    loadBallot () {
+    loadPoll () {
       var abi = require('../contract/Contract.js').abi2
       var address = this.address
       web3.eth.defaultAccount = web3.eth.accounts[0]
@@ -107,14 +108,14 @@ export default {
         if(!error){
           if(result != '0x'){
             if(result != web3.eth.accounts[0]){
-              this.ballotOwner = false
+              this.pollOwner = false
             } else {
-              this.ballotOwner = true
+              this.pollOwner = true
             }
             this.getPerm()
             this.getNOptions()
           } else {
-            alert('Couldn\'t load ballot')
+            alert('Couldn\'t load poll')
             this.contract = null
           }
         } else {
