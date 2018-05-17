@@ -1,23 +1,37 @@
-var createServer = require("auto-sni");
-var express = require("express");
-var app = express();
+var express = require("express")
+var app = express()
+var bodyParser = require('body-parser')
+app.use(bodyParser.json())
 
-app.get("/", function(req,res){
-    var msg = "If you're reading this, the server is working!";
-    res.status(200).send(msg);
-    console.log(msg);
-});
+var port = process.argv[2];
+if(port === undefined)
+port = process.env.PORT || 8080
 
-var serverConfig = {
-    email: 'goncalo.ribeiro@fe.up.pt',
-    agreeTos: true,
-    debug: true,
-    domains: ['localhost'],
-    dir: "../res",
-    ports: {
-      http: 8081,
-      https: 8082
-    }
-};
+var registrations = []
+var secret = "XlTySew1rQZIAzM7sjyKQ4Putc16RUAO"
 
-createServer(serverConfig, app);
+/* {wallet: ..., poll :...} */
+app.post("/register", function(req, res){
+    var wallet = req.body.wallet
+    var poll = req.body.poll
+    if(wallet === undefined || poll === undefined)
+    return res.status(400).json({
+        errors: ["Missing parameters!"]
+    }).send()
+    res.status(200).send()
+    registrations.push({wallet, poll})
+})
+
+/* {secret: ...} */
+app.post("/registrations", function(req, res){
+    if(req.body.secret !== secret)
+    return res.status(400).json({
+        errors: ["Permission denied!"]
+    }).send()  
+    res.status(200).json(registrations).send()
+    registrations = []
+})
+
+app.listen(port, function(){
+    console.log("Listening to port " + port)
+})
