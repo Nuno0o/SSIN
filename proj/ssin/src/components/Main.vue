@@ -8,6 +8,16 @@
     <h2>Or create a new Ballot:</h2>
     <input type="number" v-model="noptions" placeholder="Number of options">
     <button @click="createBallot">Create</button>
+    <br>
+    <div v-if="ballotCreatedAdr != null && ballotCreatedKey != null">
+      <br>
+      <br>
+      The address of the created ballot is : {{ballotCreatedAdr}}
+      <br>
+      <br>
+      <br>
+      Save the following private key to decrypt the votes:<br><br> {{ballotCreatedKey}}
+    </div>
   </div>
   <div v-if="contract != null && ballotOwner === true">
     <h1>Ballot owner Menu</h1>
@@ -54,7 +64,9 @@ export default {
       voterAddress: '',
       privateKey: '',
       nvoteoptions: 0,
-      results: []
+      results: [],
+      ballotCreatedAdr: null,
+      ballotCreatedKey: null
     }
   },
   methods: {
@@ -76,8 +88,9 @@ export default {
           var ballotAddress = result
           contract.createBallot(this.noptions, publickey, (error, result) => {
             if(!error){
-              alert('Save the following private key, you will need it to decrypt the votes:\n\n' + privatekey)
-              alert('Ballot address:\n\n' + ballotAddress)
+              this.ballotCreatedAdr = ballotAddress
+              this.ballotCreatedKey = privatekey
+              this.$forceUpdate()
             }
           })
         } else {
