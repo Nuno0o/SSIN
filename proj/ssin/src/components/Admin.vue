@@ -1,19 +1,39 @@
 <template>
 <div>
-  <h1>Voting app (Admin)</h1>
-  <h2>0x2ac7d296d27a3cf887239bd015ea69fda43f209d</h2>
-  <div v-if="!loadedContract">
-    <input v-model="address" placeholder="Contract address">
-    <button @click="instContract">Load</button>
+  <h1>Voting app SSIN</h1>
+  <div v-if="contract == null">
+    <h2>Enter Ballot Address:</h2>
+    <input v-model="address" placeholder="Ballot address">
+    <button @click="loadBallot">Load</button>
+    <h2>Or create a new Ballot:</h2>
+    <input type="number" v-model="noptions" placeholder="Number of options">
+    <button @click="createBallot">Create</button>
   </div>
-  <div v-if="loadedContract">
-    <h3>Number of votes</h3>
-    <h4 v-for="(item,index) in votes">{{index}}: {{item}}</h4>
-    <br>
+  <div v-if="contract != null && ballotOwner === true">
+    <h1>Ballot owner Menu</h1>
+    <h2>Give voting permission to following address:</h2>
     <input v-model="voterAddress" placeholder="Voter address">
     <button @click="givePerm">Give permission</button>
     <br>
-    <button v-if="loadedContract" id="close" @click="closeContract">Close</button>
+    <input v-model="privateKey" placeholder="Private key">
+    <button style="margin-top: 20px" @click="seeResults">See Results</button>
+    <br>
+    <div v-if="results.length > 0">
+      <h3>The results are the following</h3>
+      <h4 v-for="(result,index) in results">{{index}}: {{result}}</h4>
+    </div>
+    <br>
+    <button style="margin-top: 20px" @click="endVoting">End voting</button>
+    <br>
+  </div>
+  <div v-if="contract != null">
+    <h1>Voter Menu</h1>
+    <h2>Select your option</h2>
+    <button v-for="index in nvoteoptions" @click="vote(index-1)">Option {{index-1}}</Button>
+    <br>
+    <button style="margin-top: 20px" @click="status">Status</button>
+    <br>
+    <button id="close" @click="closeContract">Close</button>
   </div>
 
 </div>
@@ -27,16 +47,46 @@ export default {
   },
   data() {
     return {
+      noptions: null,
+      ballotOwner: null,
       address: '',
       contract: null,
-      loadedContract: false,
       voterAddress: '',
-      votes: []
+      privateKey: '',
+      nvoteoptions: 0,
+      results: []
     }
   },
   methods: {
-    instContract () {
+    createBallot () {
+      if (this.noptions < 1){
+        alert('Needs to have more than 0 options!')
+        return
+      }
       var abi = require('../contract/Contract.js').abi
+      var address = require('../contract/Contract.js').creator
+      web3.eth.defaultAccount = web3.eth.accounts[0]
+      var contract = web3.eth.contract(abi).at(address)
+      var NodeRSA = require('node-rsa')
+      var key = new NodeRSA({b:512})
+      var privatekey = key.exportKey('pkcs8-private-pem')
+      var publickey = key.exportKey('pkcs8-public-pem')
+      contract.createBallot.call(this.noptions, publickey, (error, result) => {
+        if(!error){
+          var ballotAddress = result
+          contract.createBallot(this.noptions, publickey, (error, result) => {
+            if(!error){
+              alert('Save the following private key, you will need it to decrypt the votes:\n\n' + privatekey)
+              alert('Ballot address:\n\n' + ballotAddress)
+            }
+          })
+        } else {
+          alert('Couldn\'t create ballot')
+        }
+      })
+    },
+    loadBallot () {
+      var abi = require('../contract/Contract.js').abi2
       var address = this.address
       web3.eth.defaultAccount = web3.eth.accounts[0]
       this.contract = web3.eth.contract(abi).at(address)
@@ -44,50 +94,131 @@ export default {
         if(!error){
           if(result != '0x'){
             if(result != web3.eth.accounts[0]){
-              alert('You are not the chairman!')
-              this.contract = null
-              return
+              this.ballotOwner = false
+            } else {
+              this.ballotOwner = true
             }
-            this.loadedContract = true
-            this.getVotes()
+            this.getPerm()
+            this.getNOptions()
           } else {
-            alert('Couldn\'t load contract')
+            alert('Couldn\'t load ballot')
+            this.contract = null
           }
         } else {
-          alert('Invalid id')
+          alert('Address is invalid')
+          this.contract = null
         }
       })
     },
-    getVotes() {
-      this.contract.getNProposals((error, result) => {
-        if(!error){
-          var nvotes = result
-          this.votes = []
-          for(var i = 0; i < nvotes; i++){
-            this.contract.getNVotes(i,(error, result) => {
-              if(!error){
-                this.votes.push(result)
-              } else {
-
-              }
-            })
+    getPerm () {
+      this.contract.getRightToVote.call((error, result) => {
+        if(!error) {
+          if(result === false) {
+            alert('You don\' have permission to vote')
+            this.contract = null
           }
         } else {
+          alert('Error')
+          this.contract = null
+        }
+      })
+    },
+    getNOptions () {
+      this.contract.getNChoices.call((error, result) => {
+        if(!error) {
+          this.nvoteoptions = parseInt(result)
+        } else {
+          alert('Error')
+          this.contract = null
+        }
+      })
+    },
+    vote (index) {
+      this.contract.getKey.call((error, result) => {
+        if(!error){
+          var NodeRSA = require('node-rsa')
+          var key = new NodeRSA(result)
+          var enc = key.encrypt(String(index + '+' +Math.random().toString(36).substring(7)), 'base64', 'utf8')
+          this.contract.castVote.call(enc,(error, result) => {
+            if(result === true){
+              this.contract.castVote(enc,(error, result) => {
+                if(!error){
+                  alert('Your vote was cast successfuly')
+                } else {
+                  alert('There was a problem casting your vote')
+                }
+              })
+            } else {
+              alert('Error casting vote, maybe the voting has already ended')
+            }
+          })
+        } else {
+          alert('Error')
+          this.contract = null
         }
       })
     },
     givePerm () {
-      this.contract.giveRightToVote(this.voterAddress,(error, result) => {
-        if(!error){
-          console.log(result)
+      this.contract.givePermission.call(this.voterAddress,(error, result) => {
+        if(!error && result === true){
+          this.contract.givePermission(this.voterAddress,(error, result) => {
+            if(!error) {
+              alert('Success!')
+            }
+          })
         } else {
-          alert('Invalid id')
+          alert('Invalid address')
+        }
+      })
+    },
+    status () {
+      this.contract.getEnded.call((error, result) => {
+        if(!error){
+          if(result === false){
+            alert('Voting is ongoing')
+          } else {
+            alert('Voting has ended')
+          }
+        }
+      })
+    },
+    seeResults () {
+      this.results = new Array(this.nvoteoptions).fill(0)
+      this.contract.getVoters.call((error, result) => {
+        if(!error){
+          var NodeRSA = require('node-rsa')
+          var key
+          try{
+            key = new NodeRSA(this.privateKey)
+          } catch(err) {
+            alert('Invalid RSA key')
+            return
+          }
+          result.forEach(elem => {
+            this.contract.getVote.call(elem, (error, result) => {
+              var dec = key.decrypt(result, 'utf8')
+              this.results[dec.split('+')[0]]++
+              this.$forceUpdate()
+            })
+          })
+        }
+      })
+    },
+    endVoting () {
+      this.contract.endVoting.call((error, result) => {
+        if(!error && result === true){
+          this.contract.endVoting(this.voterAddress,(error, result) => {
+            if(!error) {
+              alert('Success!')
+            }
+          })
+        } else {
+          alert('Error')
         }
       })
     },
     closeContract () {
       this.contract = null
-      this.loadedContract = null
     }
   }
 }

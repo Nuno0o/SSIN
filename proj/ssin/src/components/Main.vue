@@ -1,15 +1,15 @@
 <template>
 <div>
   <h1>Voting app</h1>
-  <h2>0x2ac7d296d27a3cf887239bd015ea69fda43f209d</h2>
-  <div v-if="!loadedContract">
+  <h2>Enter Ballot Address:</h2>
+  <div v-if="contract == null">
     <input v-model="address" placeholder="Contract address">
-    <button @click="instContract">Load</button>
+    <button @click="loadBallot">Load</button>
   </div>
-  <div v-if="loadedContract">
+  <div v-if="contract != null">
     <button v-for="index in nOptions" @click="vote(index-1)">Option {{index-1}}</Button>
     <br>
-    <button v-if="loadedContract" id="close" @click="closeContract">Close</button>
+    <button id="close" @click="closeContract">Close</button>
   </div>
 
 </div>
@@ -43,35 +43,29 @@ export default {
     return {
       address: '',
       contract: null,
-      loadedContract: false,
       voterAddress: '',
       nOptions: 0
     }
   },
   methods: {
-    instContract () {
-      var abi = require('../contract/Contract.js').abi
+    loadBallot () {
+      var abi = require('../contract/Contract.js').abi2
       var address = this.address
       web3.eth.defaultAccount = web3.eth.accounts[0]
       this.contract = web3.eth.contract(abi).at(address)
       this.contract.getChairperson((error, result) => {
         if(!error){
           if(result != '0x'){
-            this.contract.getRightToVote((error, result) => {
-              if(result == false){
-                this.loadedContract = false
-                this.contract = null
-                alert('You can\'t vote because either you already voted or the chairman hasn\'t given permission to you yet')
-              } else if(!error) {
-                this.loadedContract = true
-                this.getVotes()
-              }
-            })
+            if(result != web3.eth.accounts[0]){
+              alert('You are not the chairman!')
+              this.contract = null
+              return
+            }
           } else {
-            alert('Couldn\'t load contract')
+            alert('Couldn\'t load ballot')
           }
         } else {
-          alert('Invalid id')
+          alert('Address is invalid')
         }
       })
     },
@@ -94,7 +88,6 @@ export default {
     },
     closeContract () {
       this.contract = null
-      this.loadedContract = null
     }
   }
 }

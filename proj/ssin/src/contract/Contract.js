@@ -119,7 +119,7 @@ abi2 = [{
   {
     "constant": false,
     "inputs": [{
-      "name": "vote",
+      "name": "choice",
       "type": "string"
     }],
     "name": "castVote",
@@ -175,7 +175,11 @@ abi2 = [{
   }
 ]
 
+
+creator = "0x903e511692f765212e8480e8f60ab8e1d4cfe8c9"
+
 module.exports = {
   abi: abi,
-  abi2:abi2
+  abi2: abi2,
+  creator: creator
 }
