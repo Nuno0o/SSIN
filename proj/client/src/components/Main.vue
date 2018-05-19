@@ -263,7 +263,7 @@ export default {
                 }
               })
             } else {
-              this.showWarnMessage('Error casting vote')
+              this.showWarnMessage('The poll has already ended!')
             }
           })
         } else {
@@ -321,7 +321,7 @@ export default {
     endVoting () {
       this.contract.endVoting.call((error, result) => {
         if(!error && result === true){
-          this.contract.endVoting(this.voterAddress,(error, result) => {
+          this.contract.endVoting((error, result) => {
             if(!error) {
               this.showSuccessMessage('Success ending poll')
             }
