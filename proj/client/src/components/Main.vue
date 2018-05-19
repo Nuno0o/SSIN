@@ -1,18 +1,19 @@
 <template>
 <div>
+  <h1>Voting app SSIN</h1>
   <div>
     <b-alert dismissible :show="showWarn" variant="danger" @dismissed="showAlert=false">{{warnMessage}}</b-alert>
   </div>
   <div>
     <b-alert dismissible :show="showSuccess" variant="success" @dismissed="showSuccess=false">{{successMessage}}</b-alert>
   </div>
-  <h1>Voting app SSIN</h1>
+
   <!-- -->
   <div v-if="contract == null">
     <b-container class="bv-example-row">
       <b-row>
         <b-col>
-        <h2>Choose an ongoing poll:</h2>
+        <h3 id="choose_poll">Choose an ongoing poll</h3>
         <b-table responsive striped hover :items="listOfPolls">
           <template slot="address" slot-scope="data">
               <a @click="loadOnClick(data.value)">
@@ -31,12 +32,25 @@
         </div>
         </b-col>
         <b-col>
-          <h2>Or enter Poll Address manually:</h2>
-          <input v-model="address" placeholder="Poll address">
-          <button @click="loadPoll">Load</button>
-          <h2>Or create a new Poll:</h2>
-          <input type="number" v-model="noptions" placeholder="Number of options">
-          <button @click="createPoll">Create</button>
+          <b-jumbotron header="" lead="Enter Poll Address manually" >
+            <b-input-group prepend="Poll Address">
+              <b-form-input v-model="address" type="text"></b-form-input>
+              <b-input-group-append>
+                <b-btn variant="info" @click="loadPoll">Load</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-jumbotron>
+          
+          
+          <b-jumbotron header="" lead="Create new Poll" >
+            <b-input-group prepend="Number of Options">
+              <b-form-input v-model="noptions" type="number"></b-form-input>
+              <b-input-group-append>
+                <b-btn variant="info" @click="createPoll">Create</b-btn>
+              </b-input-group-append>
+            </b-input-group>
+          </b-jumbotron>
+          
           <br>
         </b-col>
       </b-row>
@@ -45,31 +59,50 @@
   </div>
   <!-- Admin app -->
   <div v-if="contract != null && pollOwner === true">
-    <h1>Poll owner Menu</h1>
-    <h2>Give voting permission to following address:</h2>
-    <input v-model="voterAddress" placeholder="Voter address">
-    <button @click="givePerm">Give permission</button>
-    <br>
-    <input v-model="privateKey" placeholder="Private key">
-    <button style="margin-top: 20px" @click="seeResults">See Results</button>
-    <br>
-    <div v-if="results.length > 0">
-      <h3>The results are the following</h3>
-      <h4 v-for="(result,index) in results">{{index}}: {{result}}</h4>
-    </div>
-    <br>
-    <button style="margin-top: 20px" @click="endVoting">End voting</button>
-    <br>
+    
+      <b-jumbotron header="" lead="" >
+        <h2>Poll owner</h2>
+        <b-container>
+          <b-row>
+            <b-col>
+              <h3>Give voting permission to address</h3>
+              <b-input-group prepend="Voter Address">
+                <b-form-input v-model="voterAddress" type="text"></b-form-input>
+                <b-input-group-append>
+                  <b-btn variant="info" @click="givePerm">Give permission</b-btn>
+                </b-input-group-append>
+              </b-input-group>
+            </b-col>
+            <b-col>
+              <h3>Results</h3>
+              <b-input-group prepend="Private Key">
+                <b-form-input v-model="privateKey" type="text"></b-form-input>
+                <b-input-group-append>
+                  <b-btn variant="info" @click="seeResults">See Results</b-btn>
+                </b-input-group-append>
+              </b-input-group>              
+              <br>
+              <div v-if="results.length > 0">
+                <h3>The results are the following</h3>
+                <h4 v-for="(result,index) in results">Option {{index}}: {{result}}</h4>
+              </div>
+            </b-col>
+          </b-row>
+        </b-container>
+        <b-btn variant="success" style="margin-top: 20px" @click="endVoting">End voting</b-btn>
+      </b-jumbotron>
   </div>
   <!-- Voter app (also appears for admins) -->
   <div v-if="contract != null">
-    <h1>Voter Menu</h1>
-    <h2>Select your option</h2>
-    <button v-for="index in nvoteoptions" @click="vote(index-1)">Option {{index-1}}</Button>
+    <b-jumbotron>
+    <h2>Voter</h2>
+    <h3>Select your option</h3>
+    <b-btn class="options" variant="outline-info" v-for="index in nvoteoptions" @click="vote(index-1)">Option {{index-1}}</b-btn>
     <br>
-    <button style="margin-top: 20px" @click="status">Status</button>
+    <b-btn variant="info" style="margin-top: 20px" @click="status">Status</b-btn>
     <br>
-    <button id="close" @click="closeContract">Close</button>
+    <b-btn variant="danger" id="close" @click="closeContract">Close</b-btn>
+    </b-jumbotron>
   </div>
 
 </div>
@@ -92,7 +125,7 @@ export default {
           var contractpoll = web3.eth.contract(abipoll).at(addresspoll)
           contractpoll.getTimeStamp.call((error, success) => {
             if(!error){
-              this.listOfPolls.push({'address': addresspoll, 'timestamp': parseInt(success)}) //formato de uma poll
+              this.listOfPolls.push({'address': addresspoll, 'timestamp': new Date(parseInt(success)*1000).toLocaleString()}) //formato de uma poll
               this.$forceUpdate()
             }
           })
@@ -174,11 +207,6 @@ export default {
               this.pollOwner = false
             } else {
               this.pollOwner = true
-              /*axios.post('http://localhost:8000/createsecret',{'poll': this.address, 'secret': })
-              setInterval(function () {
-
-                axios.post('http://localhost:8000',)
-              })*/
             }
             this.getPerm()
             this.getNOptions()
@@ -229,13 +257,13 @@ export default {
             if(result === true){
               this.contract.castVote(enc,(error, result) => {
                 if(!error){
-                  alert('Your vote was cast successfuly')
+                  this.showSuccessMessage('Your vote was cast successfuly')
                 } else {
-                  alert('There was a problem casting your vote')
+                  this.showWarnMessage('There was a problem casting your vote')
                 }
               })
             } else {
-              alert('Error casting vote, maybe the voting has already ended')
+              this.showWarnMessage('Error casting vote')
             }
           })
         } else {
@@ -249,11 +277,11 @@ export default {
         if(!error && result === true){
           this.contract.givePermission(this.voterAddress,(error, result) => {
             if(!error) {
-              alert('Success!')
+              this.showSuccessMessage('Success on granting permission')
             }
           })
         } else {
-          alert('Invalid address')
+          this.showWarnMessage('Invalid address')
         }
       })
     },
@@ -277,7 +305,7 @@ export default {
           try{
             key = new NodeRSA(this.privateKey)
           } catch(err) {
-            alert('Invalid RSA key')
+            this.showWarnMessage('Invalid RSA key')
             return
           }
           result.forEach(elem => {
@@ -295,11 +323,11 @@ export default {
         if(!error && result === true){
           this.contract.endVoting(this.voterAddress,(error, result) => {
             if(!error) {
-              alert('Success!')
+              this.showSuccessMessage('Success ending poll')
             }
           })
         } else {
-          alert('Error')
+          this.showWarnMessage('Error ending poll')
         }
       })
     },
@@ -315,6 +343,14 @@ export default {
 h1,
 h2 {
   font-weight: normal;
+}
+
+h1:first-of-type{
+  margin-top: 0px;
+  margin-bottom: 50px;
+  padding: 10px;
+  background: #71b5d4;
+  color: #fdfdfd;
 }
 
 ul {
@@ -333,5 +369,13 @@ a {
 
 #close {
   margin-top: 20px;
+}
+
+#choose_poll{
+  margin-bottom: 30px;
+}
+
+.options{
+  margin:10px;
 }
 </style>
