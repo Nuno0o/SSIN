@@ -1,24 +1,49 @@
 <template>
 <div>
-  <h1>Voting app SSIN</h1>
-  <div v-if="contract == null">
-    <h2>Enter Poll Address:</h2>
-    <input v-model="address" placeholder="Poll address">
-    <button @click="loadPoll">Load</button>
-    <h2>Or create a new Poll:</h2>
-    <input type="number" v-model="noptions" placeholder="Number of options">
-    <button @click="createPoll">Create</button>
-    <br>
-    <div v-if="pollCreatedAdr != null && pollCreatedKey != null">
-      <br>
-      <br>
-      The address of the created poll is : {{pollCreatedAdr}}
-      <br>
-      <br>
-      <br>
-      Save the following private key to decrypt the votes:<br><br> {{pollCreatedKey}}
-    </div>
+  <div>
+    <b-alert dismissible :show="showWarn" variant="danger" @dismissed="showAlert=false">{{warnMessage}}</b-alert>
   </div>
+  <div>
+    <b-alert dismissible :show="showSuccess" variant="success" @dismissed="showSuccess=false">{{successMessage}}</b-alert>
+  </div>
+  <h1>Voting app SSIN</h1>
+  <!-- -->
+  <div v-if="contract == null">
+    <b-container class="bv-example-row">
+      <b-row>
+        <b-col>
+        <h2>Choose an ongoing poll:</h2>
+        <b-table responsive striped hover :items="listOfPolls">
+          <template slot="address" slot-scope="data">
+              <a @click="loadOnClick(data.value)">
+                {{data.value}}
+              </a>
+          </template>
+        </b-table>
+        <div v-if="pollCreatedAdr != null && pollCreatedKey != null">
+          <br>
+          <br>
+          The address of the created poll is : {{pollCreatedAdr}}
+          <br>
+          <br>
+          <br>
+          Save the following private key to decrypt the votes:<br><br> {{pollCreatedKey}}
+        </div>
+        </b-col>
+        <b-col>
+          <h2>Or enter Poll Address manually:</h2>
+          <input v-model="address" placeholder="Poll address">
+          <button @click="loadPoll">Load</button>
+          <h2>Or create a new Poll:</h2>
+          <input type="number" v-model="noptions" placeholder="Number of options">
+          <button @click="createPoll">Create</button>
+          <br>
+        </b-col>
+      </b-row>
+    </b-container>
+    
+  </div>
+  <!-- Admin app -->
   <div v-if="contract != null && pollOwner === true">
     <h1>Poll owner Menu</h1>
     <h2>Give voting permission to following address:</h2>
@@ -36,6 +61,7 @@
     <button style="margin-top: 20px" @click="endVoting">End voting</button>
     <br>
   </div>
+  <!-- Voter app (also appears for admins) -->
   <div v-if="contract != null">
     <h1>Voter Menu</h1>
     <h2>Select your option</h2>
@@ -53,20 +79,20 @@
 export default {
   name: 'Main',
   created:  function () {
-    var abi = require('../contract/Contract.js').abi
-    var address = require('../contract/Contract.js').creator
+    //lista de polls
+    var abi = require('../contract/Contract.js').abi //interface
+    var address = require('../contract/Contract.js').creator //endereço
     web3.eth.defaultAccount = web3.eth.accounts[0]
-    var contract = web3.eth.contract(abi).at(address)
+    var contract = web3.eth.contract(abi).at(address) //endereço de contrato
     contract.listOfPolls.call((error, success) => {
       if(!error){
-        var abipoll = require('../contract/Contract.js').abi2
-        success.forEach(elem => {
-          console.log(elem)
+        var abipoll = require('../contract/Contract.js').abi2 
+        success.forEach(elem => { // percorrer lista de contratos
           var addresspoll = elem
           var contractpoll = web3.eth.contract(abipoll).at(addresspoll)
           contractpoll.getTimeStamp.call((error, success) => {
             if(!error){
-              this.listOfPolls.push({'address': addresspoll, 'timestamp': parseInt(success)})
+              this.listOfPolls.push({'address': addresspoll, 'timestamp': parseInt(success)}) //formato de uma poll
               this.$forceUpdate()
             }
           })
@@ -76,6 +102,7 @@ export default {
         alert('Error retrieving list of polls')
       }
     })
+    //fim de lista de polls
   },
   data() {
     return {
@@ -89,10 +116,24 @@ export default {
       nvoteoptions: 0,
       results: [],
       pollCreatedAdr: null,
-      pollCreatedKey: null
+      pollCreatedKey: null,
+
+      warnMessage: null,
+      showWarn: false,
+
+      successMessage: null,
+      showSuccess: false
     }
   },
   methods: {
+    showWarnMessage (message) {
+      this.warnMessage = message
+      this.showWarn = true
+    },
+    showSuccessMessage (message) {
+      this.successMessage = message
+      this.showSuccess = true
+    },
     createPoll () {
       if (this.noptions < 1){
         alert('Needs to have more than 0 options!')
@@ -133,6 +174,11 @@ export default {
               this.pollOwner = false
             } else {
               this.pollOwner = true
+              /*axios.post('http://localhost:8000/createsecret',{'poll': this.address, 'secret': })
+              setInterval(function () {
+
+                axios.post('http://localhost:8000',)
+              })*/
             }
             this.getPerm()
             this.getNOptions()
@@ -146,11 +192,15 @@ export default {
         }
       })
     },
-    getPerm () {
+    loadOnClick (address) {
+      this.address = address
+      this.loadPoll()
+    },
+    getPerm () { // saber permissoes
       this.contract.getRightToVote.call((error, result) => {
         if(!error) {
           if(result === false) {
-            alert('You don\' have permission to vote')
+            this.showWarnMessage('You don\'t have permission to vote on this poll')
             this.contract = null
           }
         } else {

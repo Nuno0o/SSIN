@@ -8,7 +8,17 @@ if(port === undefined)
 port = process.env.PORT || 8080
 
 var registrations = []
-var secret = "XlTySew1rQZIAzM7sjyKQ4Putc16RUAO"
+var secret = []
+
+/* Create secret key for poll {poll: ..., secret: ...} */
+app.post("/createsecret", function(req, res){
+    if(req.body.secret === undefined || req.body.poll === undefined)
+    return res.status(400).json({
+        errors: ["Missing parameters!"]
+    }).send()
+    res.status(200).send()
+    secret[req.body.poll] = req.body.secret
+})
 
 /* {wallet: ..., poll :...} */
 app.post("/register", function(req, res){
@@ -24,12 +34,18 @@ app.post("/register", function(req, res){
 
 /* {secret: ...} */
 app.post("/registrations", function(req, res){
-    if(req.body.secret !== secret)
+    if (req.body.poll === undefined || secret[req.body.poll] === undefined || req.body.secret !== secret[req.body.poll])
     return res.status(400).json({
         errors: ["Permission denied!"]
-    }).send()  
-    res.status(200).json(registrations).send()
-    registrations = []
+    }).send()
+    var regist = []
+    registration.forEach(elem => {
+        if(elem.poll === req.body.poll){
+            regist.push(elem)
+            registrations.splice(registrations.indexOf(elem),1)
+        }
+    })
+    res.status(200).json(regist).send()
 })
 
 app.listen(port, function(){

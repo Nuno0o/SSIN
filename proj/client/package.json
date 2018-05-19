@@ -10,6 +10,9 @@
     "build": "node build/build.js"
   },
   "dependencies": {
+    "axios": "^0.18.0",
+    "bootstrap-vue": "^2.0.0-rc.10",
+    "element-ui": "^2.3.8",
     "module": "^1.2.5",
     "node-rsa": "^1.0.0",
     "raw-loader": "^0.5.1",
